@@ -46,6 +46,7 @@ jobs:
       run: |
         mkdir -p ${{ github.workspace }}/deps
         mkdir -p ${{ github.workspace }}/deps/Qt
+        mkdir -p ${{ github.workspace }}/deps/lua-apclientpp
 
     - name: Download prebuilt vcpkg packages
       working-directory: ${{ github.workspace }}/deps
@@ -67,6 +68,17 @@ jobs:
     - name: Extract archived prebuilt vcpkg packages
       working-directory: ${{ github.workspace }}/deps
       run: 7z x -y -ovcpkg-x64-windows-${{ inputs.msvc }}-${{ env.VCPKG_TAG }} $env:archive
+
+    - name: Download lua-apclientpp
+      working-directory: ${{ github.workspace }}/deps/lua-apclientpp
+      run: >
+        curl --fail --retry 3 -L
+        -o lua51.7z
+        https://github.com/black-sliver/lua-apclientpp/releases/download/v0.4.9%2B2/lua51.7z
+
+    - name: Extract lua-apclientpp
+      working-directory: ${{ github.workspace }}/deps/lua-apclientpp
+      run: 7z x -y lua51.7z
 
     - name: Cache Qt
       id: qt-cache
@@ -149,6 +161,12 @@ jobs:
         cp plugins/imageformats/qsvg.dll ${{ github.workspace }}/build/imageformats
         mkdir ${{ github.workspace }}/build/iconengines
         cp plugins/iconengines/qsvgicon.dll ${{ github.workspace }}/build/iconengines
+
+    - name: Copy lua-apclientpp files
+      working-directory: ${{ github.workspace }}/deps/lua-apclientpp/lua51
+      run: |
+        cp lua51-clang64-dynamic/lua-apclientpp.dll ${{ github.workspace }}/build
+        cp lua51-clang64-dynamic/lua-apclientpp-license.txt ${{ github.workspace }}/build
 
     - name: Create symbol server directory structure
       working-directory: ${{ github.workspace }}/build
