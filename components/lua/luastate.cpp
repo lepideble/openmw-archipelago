@@ -52,7 +52,7 @@ namespace LuaUtil
     }
 
     static const std::string safeFunctions[] = { "assert", "error", "ipairs", "next", "pairs", "pcall", "select",
-        "tonumber", "tostring", "type", "unpack", "xpcall", "rawequal", "rawget", "rawset", "setmetatable" };
+        "tonumber", "tostring", "type", "unpack", "xpcall", "rawequal", "rawget", "rawset", "setmetatable", "requireAP" };
     static const std::string safePackages[] = { "coroutine", "math", "string", "table", "utf8" };
 
     static constexpr int64_t countHookStep = 1000;
@@ -186,7 +186,7 @@ namespace LuaUtil
 
         protectedCall([&](LuaView& view) {
             auto& sol = view.sol();
-            sol.open_libraries(sol::lib::base, sol::lib::coroutine, sol::lib::math, sol::lib::bit32, sol::lib::string,
+            sol.open_libraries(sol::lib::package, sol::lib::base, sol::lib::coroutine, sol::lib::math, sol::lib::bit32, sol::lib::string,
                 sol::lib::table, sol::lib::os, sol::lib::debug);
 
 #ifndef NO_LUAJIT
@@ -280,6 +280,9 @@ namespace LuaUtil
                 getSafeMetatable = function(v)
                     if type(v) ~= 'table' then error('getmetatable is allowed only for tables', 2) end
                     return getmetatable(v)
+                end
+                requireAP = function()
+                    return require "lua-apclientpp"
                 end
             )");
 
