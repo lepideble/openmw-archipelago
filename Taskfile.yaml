@@ -1,0 +1,25 @@
+version: '3'
+
+tasks:
+  configure:
+    cmd: |
+      cmake -B build \
+        -DBUILD_BULLETOBJECTTOOL=OFF \
+        -DBUILD_BSATOOL=OFF \
+        -DBUILD_ESMTOOL=OFF \
+        -DBUILD_ESSIMPORTER=OFF \
+        -DBUILD_LAUNCHER=OFF \
+        -DBUILD_MWINIIMPORTER=OFF \
+        -DBUILD_NAVMESHTOOL=OFF \
+        -DBUILD_NIFTEST=OFF \
+        -DBUILD_OPENCS=OFF \
+        -DBUILD_WIZARD=OFF \
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_INSTALL_PREFIX=install \
+        -DOPENMW_USE_SYSTEM_MYGUI=OFF \
+  build:
+    dir: build
+    cmd: cmake --build . -- -j $(nproc)
+  install:
+    dir: build
+    cmd: cmake --install .

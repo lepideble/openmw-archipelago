@@ -24,6 +24,7 @@
 #include "uibindings.hpp"
 #include "vfsbindings.hpp"
 #include "worldbindings.hpp"
+#include "archipelagobindings.hpp"
 
 namespace MWLua
 {
@@ -38,6 +39,7 @@ namespace MWLua
             { "openmw.markup", initMarkupPackage(context) },
             { "openmw.util", LuaUtil::initUtilPackage(lua) },
             { "openmw.vfs", initVFSPackage(context) },
+            { "archipelago", initArchipelagoPackage(context) },
         };
     }
 
