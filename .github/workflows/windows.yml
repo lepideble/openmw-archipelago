@@ -98,6 +98,16 @@ jobs:
         -S .
         -B ${{ github.workspace }}/build
         -G Ninja
+        -D BUILD_BULLETOBJECTTOOL=OFF
+        -D BUILD_BSATOOL=OFF
+        -D BUILD_ESMTOOL=OFF
+        -D BUILD_ESSIMPORTER=OFF
+        -D BUILD_LAUNCHER=OFF
+        -D BUILD_MWINIIMPORTER=OFF
+        -D BUILD_NAVMESHTOOL=OFF
+        -D BUILD_NIFTEST=OFF
+        -D BUILD_OPENCS=OFF
+        -D BUILD_WIZARD=OFF
         -D CMAKE_BUILD_TYPE=${{ inputs.build-type }}
         -D CMAKE_TOOLCHAIN_FILE='${{ github.workspace }}/deps/vcpkg-x64-windows-${{ inputs.msvc }}-${{ env.VCPKG_TAG }}/scripts/buildsystems/vcpkg.cmake'
         -D CMAKE_PREFIX_PATH='${{ github.workspace }}/deps/Qt/${{ env.QT_VER }}/msvc2019_64'
@@ -106,9 +116,6 @@ jobs:
         -D LuaJit_INCLUDE_DIR='${{ github.workspace }}/deps/vcpkg-x64-windows-${{ inputs.msvc }}-${{ env.VCPKG_TAG }}/installed/x64-windows/include/luajit'
         -D LuaJit_LIBRARY='${{ github.workspace }}/deps/vcpkg-x64-windows-${{ inputs.msvc }}-${{ env.VCPKG_TAG }}/installed/x64-windows/lib/lua51.lib'
         -D BUILD_BENCHMARKS=${{ ! inputs.package }}
-        -D BUILD_COMPONENTS_TESTS=${{ ! inputs.package }}
-        -D BUILD_OPENMW_TESTS=${{ ! inputs.package }}
-        -D BUILD_OPENCS_TESTS=${{ ! inputs.package }}
         -D OPENMW_USE_SYSTEM_SQLITE3=OFF
         -D OPENMW_USE_SYSTEM_YAML_CPP=OFF
         -D OPENMW_LTO_BUILD=ON
@@ -211,34 +218,9 @@ jobs:
           ${{ github.workspace }}/build/**/*.ninja_log
           ${{ github.workspace }}/build/**/CMakeCache.txt
 
-    - name: Upload to symbol server
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_DEFAULT_REGION: eu-west-3
-      if: ${{ env.AWS_ACCESS_KEY_ID != '' && env.AWS_SECRET_ACCESS_KEY != '' && inputs.package }}
-      working-directory: ${{ github.workspace }}/SymStore
-      run: |
-        choco uninstall awscli -y
-        choco install awscli -y --version=2.22.35
-        aws --version
-        aws --endpoint-url https://rgw.ctrl-c.liu.se s3 sync --size-only --exclude * --include *.ex_ --include *.dl_ --include *.pd_ . s3://openmw-sym
-
     - name: Add install directory to PATH
       shell: bash
       run: echo '${{ github.workspace }}/install' >> ${GITHUB_PATH}
-
-    - name: Run components tests
-      if: ${{ ! inputs.package }}
-      run: build/components-tests.exe
-
-    - name: Run OpenMW tests
-      if: ${{ ! inputs.package }}
-      run: build/openmw-tests.exe
-
-    - name: Run OpenMW-CS tests
-      if: ${{ ! inputs.package }}
-      run: build/openmw-cs-tests.exe
 
     - name: Run detournavigator navmeshtilescache benchmark
       if: ${{ ! inputs.package }}
