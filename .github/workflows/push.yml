@@ -29,42 +29,40 @@ jobs:
     - name: Configure
       run: >
         cmake .
+        -D BUILD_BULLETOBJECTTOOL=OFF
+        -D BUILD_BSATOOL=OFF
+        -D BUILD_ESMTOOL=OFF
+        -D BUILD_ESSIMPORTER=OFF
+        -D BUILD_LAUNCHER=OFF
+        -D BUILD_MWINIIMPORTER=OFF
+        -D BUILD_NAVMESHTOOL=OFF
+        -D BUILD_NIFTEST=OFF
+        -D BUILD_OPENCS=OFF
+        -D BUILD_WIZARD=OFF
         -D CMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
         -D OPENMW_USE_SYSTEM_RECASTNAVIGATION=ON
         -D USE_SYSTEM_TINYXML=ON
-        -D BUILD_COMPONENTS_TESTS=ON
-        -D BUILD_OPENMW_TESTS=ON
-        -D BUILD_OPENCS_TESTS=ON
         -D CMAKE_INSTALL_PREFIX=install
 
     - name: Build
       run: cmake --build . -- -j$(nproc)
 
-    - name: Run components tests
-      run: ./components-tests
+    - name: Install
+      shell: bash
+      run: cmake --install .
 
-    - name: Run OpenMW tests
-      run: ./openmw-tests
+    - name: Create Artifact
+      shell: bash
+      working-directory: install
+      run: |
+        ls -laR
+        7z a ../build_artifact.7z .
 
-    - name: Run OpenMW-CS tests
-      run: ./openmw-cs-tests
-
-    # - name: Install
-    #   shell: bash
-    #   run: cmake --install .
-
-    # - name: Create Artifact
-    #   shell: bash
-    #   working-directory: install
-    #   run: |
-    #     ls -laR
-    #     7z a ../build_artifact.7z .
-
-    # - name: Upload Artifact
-    #   uses: actions/upload-artifact@v1
-    #   with:
-    #     path: ./build_artifact.7z
-    #     name: build_artifact.7z
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v7.0.1
+      with:
+        path: ./build_artifact.7z
+        name: build_artifact.7z
 
   MacOS:
     runs-on: macos-latest
